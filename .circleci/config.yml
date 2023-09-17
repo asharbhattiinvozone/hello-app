@@ -12,6 +12,7 @@ jobs:
           name: Deploy to Kubernetes
           command: |
             echo $GCP_OIDC >> kubeconfig.json
+            echo "Midde Echo"
             echo $gcp_oidc >> kubeconfigs.json
             pwd && ls -lhtr
             cat kubeconfig.json && cat kubeconfigs.json
