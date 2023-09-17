@@ -13,7 +13,7 @@ jobs:
           command: |
             echo $GCP_OIDC >> kubeconfig.json
             echo $gcp_oidc >> kubeconfigs.json
-            pwd && ls -l
+            pwd && ls -lhtr
             cat kubeconfig.json && cat kubeconfigs.json
             #kubectl apply -f path/to/your/kubernetes/manifests/
 
