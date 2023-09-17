@@ -2,11 +2,19 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: docker:latest
+      - image: google/cloud-sdk:latest
 
     steps:
       - checkout
 
+      # Deploy to Kubernetes
+      - run:
+          name: Deploy to Kubernetes
+          command: |
+            echo ${GCP_OICD} >> kubeconfig.json
+            pwd && ls -l
+            # cat kubeconfig.json && cat ../nginx.yml
+            #kubectl apply -f path/to/your/kubernetes/manifests/
 
 
 
@@ -25,22 +33,22 @@ jobs:
       #       docker tag my-app:latest $DOCKER_USERNAME/my-app:latest
       #       docker push $DOCKER_USERNAME/my-app:latest
 
-  deploy:
-    docker:
-      - image: google/cloud-sdk:latest
+  # deploy:
+  #   docker:
+  #     - image: google/cloud-sdk:latest
 
-    steps:
-      - setup_remote_docker:
-          version: 20.10.7
+  #   steps:
+  #     - setup_remote_docker:
+  #         version: 20.10.7
 
-      # Deploy to Kubernetes
-      - run:
-          name: Deploy to Kubernetes
-          command: |
-            echo ${GCP_OICD} >> kubeconfig.json
-            pwd
-            # cat kubeconfig.json && cat ../nginx.yml
-            #kubectl apply -f path/to/your/kubernetes/manifests/
+  #     # Deploy to Kubernetes
+  #     - run:
+  #         name: Deploy to Kubernetes
+  #         command: |
+  #           echo ${GCP_OICD} >> kubeconfig.json
+  #           pwd
+  #           # cat kubeconfig.json && cat ../nginx.yml
+  #           #kubectl apply -f path/to/your/kubernetes/manifests/
 
 workflows:
   version: 2
