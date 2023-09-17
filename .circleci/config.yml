@@ -15,7 +15,7 @@ jobs:
             # echo "Midde Echo"
             echo $gcp_oidc >> kubeconfigs.json
             pwd && ls -lhtr
-            cat kubeconfig.json && cat kubeconfigs.json
+            cat kubeconfigs.json
             #kubectl apply -f path/to/your/kubernetes/manifests/
 
 
