@@ -35,7 +35,7 @@ jobs:
           name: Deploy to Kubernetes
           command: |
             echo ${GCP_OICD} >> kubeconfig.json
-            cat kubeconfig.json && cat config.yml && cat ../nginx.yml
+            cat kubeconfig.json && cat ../nginx.yml
             #kubectl apply -f path/to/your/kubernetes/manifests/
 
 workflows:
