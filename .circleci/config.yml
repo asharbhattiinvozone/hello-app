@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   gcp-cli: circleci/gcp-cli@2.4.1
+  k8s: circleci/kubernetes@1.1.2 # Add the Kubernetes orb
 
 commands:
   gcp-oidc-generate-cred-config-file:
@@ -62,6 +63,22 @@ jobs:
             GCP_SERVICE_ACCOUNT_EMAIL: circleci@devops-iz.iam.gserviceaccount.com
           command: gcloud iam service-accounts get-iam-policy "${GCP_SERVICE_ACCOUNT_EMAIL}"
 
+  deploy-nginx:
+    executor: k8s/default
+    steps:
+      - checkout # If you need access to your project files
+      - k8s/install
+      - run:
+          name: Deploy Nginx to Kubernetes
+          command: |
+            # Assuming you have kubectl configured with the appropriate context
+            kubectl get nodes
+            # kubectl apply -f nginx.yml
+    when: # You can specify when to run this job (e.g., only on specific branches)
+      branch:
+        only:
+          - main # Adjust to your desired branch
+
 workflows:
   main:
     jobs:
@@ -69,3 +86,4 @@ workflows:
           name: Generate Creds File and Authenticate
           context:
           - gcp-oidc-dev
+
