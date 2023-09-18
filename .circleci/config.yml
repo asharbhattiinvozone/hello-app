@@ -64,6 +64,7 @@ jobs:
           command: |
             # Assuming you have kubectl configured with the appropriate context
             # kubectl get nodes
+            gcloud container clusters get-credentials devops-iz-gke --zone us-central1-a --project devops-iz
             ls -lhtr
           # command: gcloud iam service-accounts get-iam-policy "${GCP_SERVICE_ACCOUNT_EMAIL}"
       - run:
@@ -76,7 +77,6 @@ jobs:
           name: Deploy Nginx to Kubernetes
           command: |
             # Assuming you have kubectl configured with the appropriate context
-            gcloud container clusters get-credentials devops-iz-gke --zone us-central1-a --project devops-iz &&
             kubectl get nodes
     # when:
     #   # You can specify when to run this job (e.g., only on specific branches)
