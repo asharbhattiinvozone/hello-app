@@ -1,72 +1,72 @@
 version: 2.1
+orbs:
+  gcp-cli: circleci/gcp-cli@2.4.1
+
+commands:
+  gcp-oidc-generate-cred-config-file:
+    description: "Authenticate with GCP using a CircleCI OIDC token."
+    parameters:
+      project_id:
+        type: env_var_name
+        default: GCP_PROJECT_ID
+      workload_identity_pool_id:
+        type: env_var_name
+        default: GCP_WIP_ID
+      workload_identity_pool_provider_id:
+        type: env_var_name
+        default: GCP_WIP_PROVIDER_ID
+      service_account_email:
+        type: env_var_name
+        default: GCP_SERVICE_ACCOUNT_EMAIL
+      gcp_cred_config_file_path:
+        type: string
+        default: /home/circleci/gcp_cred_config.json
+      oidc_token_file_path:
+        type: string
+        default: /home/circleci/oidc_token.json
+    steps:
+      - run:
+          command: |
+            # Store OIDC token in temp file
+            echo $CIRCLE_OIDC_TOKEN > << parameters.oidc_token_file_path >>
+            # Create a credential configuration for the generated OIDC ID Token
+            gcloud iam workload-identity-pools create-cred-config \
+                "projects/${<< parameters.project_id >>}/locations/global/workloadIdentityPools/${<< parameters.workload_identity_pool_id >>}/providers/${<< parameters.workload_identity_pool_provider_id >>}"\
+                --output-file="<< parameters.gcp_cred_config_file_path >>" \
+                --service-account="${<< parameters.service_account_email >>}" \
+                --credential-source-file=<< parameters.oidc_token_file_path >>
+
+  gcp-oidc-authenticate:
+    description: "Authenticate with GCP using a GCP credentials file."
+    parameters:
+      gcp_cred_config_file_path:
+        type: string
+        default: /home/circleci/gcp_cred_config.json
+    steps:
+      - run:
+          command: |
+            # Configure gcloud to leverage the generated credential configuration
+            gcloud auth login --brief --cred-file "<< parameters.gcp_cred_config_file_path >>"
+            # Configure ADC
+            echo "export GOOGLE_APPLICATION_CREDENTIALS='<< parameters.gcp_cred_config_file_path >>'" | tee -a "$BASH_ENV"
+
 jobs:
-  build:
-    docker:
-      - image: google/cloud-sdk:latest
-
+  gcp-oidc-defaults:
+    executor: gcp-cli/default
     steps:
-      - checkout
-
-      # Deploy to Kubernetes
+      - gcp-cli/install
+      - gcp-oidc-generate-cred-config-file
+      - gcp-oidc-authenticate
       - run:
-          name: Deploy to Kubernetes
-          command: |
-            # echo $GCP_OIDC >> kubeconfig.json
-            # echo "Midde Echo"
-            echo $gcp_oidc >> kubeconfigs.json
-            pwd && ls -lhtr
-            cat kubeconfigs.json
-            #kubectl apply -f path/to/your/kubernetes/manifests/
-
-
-
-      # # Build your Docker image
-      # - setup_remote_docker:
-      #     version: 20.10.7
-      # - run:
-      #     name: Build Docker image
-      #     command: docker build -t my-app:latest .
-
-      # Push the Docker image to Docker Hub
-      # - run:
-      #     name: Push Docker image
-      #     command: |
-      #       docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      #       docker tag my-app:latest $DOCKER_USERNAME/my-app:latest
-      #       docker push $DOCKER_USERNAME/my-app:latest
-
-  deploy:
-    docker:
-      - image: google/cloud-sdk:latest
-
-    steps:
-      - setup_remote_docker:
-          version: 20.10.7
-
-      # Deploy to Kubernetes
-      - run:
-          name: Deploy to Kubernetes
-          command: |
-            echo ${GCP_OICD} >> kubeconfig.json
-            echo $CIRCLE_OIDC_TOKEN >> CIRCLE_OIDC_TOKEN_FILE
-            pwd
-            # cat kubeconfig.json && cat ../nginx.yml
-            #kubectl apply -f path/to/your/kubernetes/manifests/
+          name: Verify that gcloud is authenticated
+          environment:
+            GCP_SERVICE_ACCOUNT_EMAIL: jennings-oidc-test@makoto-workbench.iam.gserviceaccount.com
+          command: gcloud iam service-accounts get-iam-policy "${GCP_SERVICE_ACCOUNT_EMAIL}"
 
 workflows:
-  version: 2
-  build-and-deploy:
+  main:
     jobs:
-      - build:
-          filters:
-            branches:
-              only:
-                - main
-
-      - deploy:
-          requires:
-            - build
-          filters:
-            branches:
-              only:
-                - main
+      - gcp-oidc-defaults:
+          name: Generate Creds File and Authenticate
+          context:
+          - gcp-oidc-dev
