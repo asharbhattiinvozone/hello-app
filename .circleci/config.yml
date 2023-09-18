@@ -49,17 +49,6 @@ commands:
             gcloud auth login --brief --cred-file "<< parameters.gcp_cred_config_file_path >>"
             # Configure ADC
             echo "export GOOGLE_APPLICATION_CREDENTIALS='<< parameters.gcp_cred_config_file_path >>'" | tee -a "$BASH_ENV"
-            echo "--------------------"
-            pwd
-            ls
-            cat /home/circleci/gcp_cred_config.json
-            echo $GCP_WIP_ID
-            echo $GCP_PROJECT_ID
-            echo  $GCP_WIP_PROVIDER_ID
-            echo $GCP_SERVICE_ACCOUNT_EMAIL
-            cat /home/circleci/oidc_token.json
-            echo "--------------------"
-
 jobs:
   gcp-oidc-defaults:
     executor: gcp-cli/default
