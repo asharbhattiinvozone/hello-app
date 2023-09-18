@@ -49,7 +49,6 @@ commands:
             gcloud auth login --brief --cred-file "<< parameters.gcp_cred_config_file_path >>"
             # Configure ADC
             echo "export GOOGLE_APPLICATION_CREDENTIALS='<< parameters.gcp_cred_config_file_path >>'" | tee -a "$BASH_ENV"
-
 jobs:
   gcp-oidc-defaults:
     executor: gcp-cli/default
@@ -59,11 +58,39 @@ jobs:
       - gcp-oidc-generate-cred-config-file
       - gcp-oidc-authenticate
       - run:
-          name: Connect to GKE Cluster and Get Nodes
+          name: Verify that gcloud is authenticated
+          environment:
+            GCP_SERVICE_ACCOUNT_EMAIL: circleci@devops-iz.iam.gserviceaccount.com
           command: |
             # Assuming you have kubectl configured with the appropriate context
-            gcloud container clusters get-credentials devops-iz-gke --zone us-central1-a --project devops-iz
+            # kubectl get nodes
+            # Set the OIDC token as a kubectl credential
+            gcloud components install kubectl
+            kubectl version --client
+            gcloud container clusters get-credentials devops-iz-gke --location=us-central1-a
+            # # kubectl config set-credentials circleci@devops-iz.iam.gserviceaccount.com --token=$CIRCLE_OIDC_TOKEN
+            
+            # # Set the OIDC authentication in the kubeconfig file
+            # kubectl config set-context oidc-context --cluster=devops-iz-gke --user=circleci@devops-iz.iam.gserviceaccount.com
+            # kubectl config use-context oidc-context
             kubectl get nodes
+          # command: gcloud iam service-accounts get-iam-policy "${GCP_SERVICE_ACCOUNT_EMAIL}"
+      # - run:
+      #     name: Install kubectl
+      #     command: |
+      #       curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+      #       chmod +x kubectl
+      #       sudo mv kubectl /usr/local/bin/
+      - run:
+          name: Deploy Nginx to Kubernetes
+          command: |
+            # Assuming you have kubectl configured with the appropriate context
+            kubectl get nodes
+    # when:
+    #   # You can specify when to run this job (e.g., only on specific branches)
+    #   branch:
+    #     only:
+    #       - main # Adjust to your desired branch
 
 workflows:
     main:
@@ -72,3 +99,8 @@ workflows:
             name: Generate Creds File and Authenticate
             context:
             - gcp-oidc-dev
+
+# gcloud container clusters get-credentials authn-authz-cluster
+
+# gcloud container clusters get-credentials devops-iz-gke --location=us-central1-a
+# gcloud container clusters get-credentials devops-iz-gke --zone us-central1-a --project devops-iz
