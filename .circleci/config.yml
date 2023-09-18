@@ -57,6 +57,7 @@ commands:
             echo $GCP_PROJECT_ID
             echo  $GCP_WIP_PROVIDER_ID
             echo $GCP_SERVICE_ACCOUNT_EMAIL
+            cat /home/circleci/oidc_token.json
             echo "--------------------"
 
 jobs:
