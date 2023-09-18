@@ -78,11 +78,11 @@ jobs:
             # Assuming you have kubectl configured with the appropriate context
             gcloud container clusters get-credentials devops-iz-gke --zone us-central1-a --project devops-iz &&
             kubectl get nodes
-    when:
-      # You can specify when to run this job (e.g., only on specific branches)
-      branch:
-        only:
-          - main # Adjust to your desired branch
+    # when:
+    #   # You can specify when to run this job (e.g., only on specific branches)
+    #   branch:
+    #     only:
+    #       - main # Adjust to your desired branch
 
 workflows:
     main:
