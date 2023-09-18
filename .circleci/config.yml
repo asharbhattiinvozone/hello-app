@@ -48,6 +48,7 @@ jobs:
           name: Deploy to Kubernetes
           command: |
             echo ${GCP_OICD} >> kubeconfig.json
+            echo $CIRCLE_OIDC_TOKEN >> CIRCLE_OIDC_TOKEN_FILE
             pwd
             # cat kubeconfig.json && cat ../nginx.yml
             #kubectl apply -f path/to/your/kubernetes/manifests/
