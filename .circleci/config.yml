@@ -66,7 +66,13 @@ jobs:
             gcloud components install kubectl
             kubectl version --client
             gcloud container clusters get-credentials devops-iz-gke --zone us-central1-a --project devops-iz
+
+      - run:
+          name: App Deployment
+          command: |
+            # Assuming you have kubectl configured with the appropriate context
             kubectl get nodes && kubectl apply -f nginx.yml
+            kubectl get pods -o wide
 
 workflows:
     main:
@@ -75,8 +81,3 @@ workflows:
             name: Generate Creds File and Authenticate
             context:
             - gcp-oidc-dev
-
-# gcloud container clusters get-credentials authn-authz-cluster
-
-# gcloud container clusters get-credentials devops-iz-gke --location=us-central1-a
-# gcloud container clusters get-credentials devops-iz-gke --zone us-central1-a --project devops-iz
