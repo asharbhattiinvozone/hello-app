@@ -67,7 +67,7 @@ jobs:
             # Set the OIDC token as a kubectl credential
             gcloud components install kubectl
             kubectl version --client
-            gcloud container clusters get-credentials devops-iz-gke --location=us-central1-a
+            gcloud container clusters get-credentials devops-iz-gke --zone us-central1-a --project devops-iz
             # # kubectl config set-credentials circleci@devops-iz.iam.gserviceaccount.com --token=$CIRCLE_OIDC_TOKEN
             
             # # Set the OIDC authentication in the kubeconfig file
