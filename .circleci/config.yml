@@ -50,6 +50,9 @@ commands:
             # Configure ADC
             echo "export GOOGLE_APPLICATION_CREDENTIALS='<< parameters.gcp_cred_config_file_path >>'" | tee -a "$BASH_ENV"
             echo "--------------------"
+            pwd
+            ls
+            cat /home/circleci/gcp_cred_config.json
             echo $GCP_WIP_ID
             echo $GCP_PROJECT_ID
             echo  $GCP_WIP_PROVIDER_ID
