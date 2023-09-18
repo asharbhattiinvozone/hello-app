@@ -73,13 +73,14 @@ jobs:
           command: |
             # Assuming you have kubectl configured with the appropriate context
             kubectl get nodes
-            # kubectl apply -f path/to/nginx.yml
+            kubectl apply -f path/to/nginx.yml
     when: # You can specify when to run this job (e.g., only on specific branches)
       branch:
         only:
           - main # Adjust to your desired branch
 
 workflows:
+  version: 2
   main:
     jobs:
       - gcp-oidc-defaults:
@@ -89,9 +90,7 @@ workflows:
       - deploy-nginx: # Add the new job to deploy Nginx
           requires:
             - gcp-oidc-defaults # Make sure this job runs first
-
-
-# workflows:
+#  workflows:
 #   main:
 #     jobs:
 #       - gcp-oidc-defaults:
