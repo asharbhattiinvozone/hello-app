@@ -64,15 +64,21 @@ jobs:
           command: |
             # Assuming you have kubectl configured with the appropriate context
             # kubectl get nodes
-            gcloud container clusters get-credentials devops-iz-gke --zone us-central1-a --project devops-iz
-            ls -lhtr
+            # Set the OIDC token as a kubectl credential
+            gcloud components install kubectl
+            kubectl version --client
+            kubectl config set-credentials circleci@devops-iz.iam.gserviceaccount.com --token=$CIRCLE_OIDC_TOKEN
+            
+            # Set the OIDC authentication in the kubeconfig file
+            kubectl config set-context oidc-context --cluster=devops-iz-gke --user=circleci@devops-iz.iam.gserviceaccount.com
+            kubectl config use-context oidc-context
           # command: gcloud iam service-accounts get-iam-policy "${GCP_SERVICE_ACCOUNT_EMAIL}"
-      - run:
-          name: Install kubectl
-          command: |
-            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-            chmod +x kubectl
-            sudo mv kubectl /usr/local/bin/
+      # - run:
+      #     name: Install kubectl
+      #     command: |
+      #       curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+      #       chmod +x kubectl
+      #       sudo mv kubectl /usr/local/bin/
       - run:
           name: Deploy Nginx to Kubernetes
           command: |
