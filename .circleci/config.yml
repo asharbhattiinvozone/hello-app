@@ -62,8 +62,19 @@ jobs:
             GCP_SERVICE_ACCOUNT_EMAIL: circleci@devops-iz.iam.gserviceaccount.com
           command: |
             # Assuming you have kubectl configured with the appropriate context
-            kubectl get nodes
+            # kubectl get nodes
           # command: gcloud iam service-accounts get-iam-policy "${GCP_SERVICE_ACCOUNT_EMAIL}"
+      - run:
+          name: Install kubectl
+          command: |
+            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+            chmod +x kubectl
+            sudo mv kubectl /usr/local/bin/
+      - run:
+          name: Deploy Nginx to Kubernetes
+          command: |
+            # Assuming you have kubectl configured with the appropriate context
+            kubectl get nodes
 
 workflows:
     main:
