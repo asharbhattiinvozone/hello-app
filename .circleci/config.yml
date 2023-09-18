@@ -62,7 +62,7 @@ jobs:
             GCP_SERVICE_ACCOUNT_EMAIL: circleci@devops-iz.iam.gserviceaccount.com
           command: |
             # Assuming you have kubectl configured with the appropriate context
-            gcloud iam service-accounts get-iam-policy "${GCP_SERVICE_ACCOUNT_EMAIL}"
+            gcloud iam service-accounts get-iam-policy "${GCP_SERVICE_ACCOUNT_EMAIL}" &&
             kubectl get nodes
           # command: gcloud iam service-accounts get-iam-policy "${GCP_SERVICE_ACCOUNT_EMAIL}"
 
