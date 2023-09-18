@@ -60,41 +60,17 @@ jobs:
           name: Verify that gcloud is authenticated
           environment:
             GCP_SERVICE_ACCOUNT_EMAIL: circleci@devops-iz.iam.gserviceaccount.com
-          command: gcloud iam service-accounts get-iam-policy "${GCP_SERVICE_ACCOUNT_EMAIL}"
-
-
-  deploy-nginx:
-    executor: gcp-cli/default # Use the GCP executor for simplicity
-    steps:
-      - checkout # If you need access to your project files
-      - gcp-oidc-authenticate # Authenticate with GCP as you did before
-      - run:
-          name: Deploy Nginx to Kubernetes
           command: |
             # Assuming you have kubectl configured with the appropriate context
+            gcloud iam service-accounts get-iam-policy "${GCP_SERVICE_ACCOUNT_EMAIL}"
             kubectl get nodes
-            kubectl apply -f path/to/nginx.yml
-    when: # You can specify when to run this job (e.g., only on specific branches)
-      branch:
-        only:
-          - main # Adjust to your desired branch
+          # command: gcloud iam service-accounts get-iam-policy "${GCP_SERVICE_ACCOUNT_EMAIL}"
 
 workflows:
-  version: 2
-  main:
-    jobs:
-      - gcp-oidc-defaults:
-          name: Generate Creds File and Authenticate
-          context:
-          - gcp-oidc-dev
-      - deploy-nginx: # Add the new job to deploy Nginx
-          requires:
-            - gcp-oidc-defaults # Make sure this job runs first
-#  workflows:
-#   main:
-#     jobs:
-#       - gcp-oidc-defaults:
-#           name: Generate Creds File and Authenticate
-#           context:
-#           - gcp-oidc-dev
+    main:
+      jobs:
+        - gcp-oidc-defaults:
+            name: Generate Creds File and Authenticate
+            context:
+            - gcp-oidc-dev
 
