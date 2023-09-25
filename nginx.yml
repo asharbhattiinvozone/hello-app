@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: nginx-deployment
 spec:
-  replicas: 3  # Number of desired replicas
+  replicas: 3
   selector:
     matchLabels:
       app: nginx
@@ -17,6 +17,7 @@ spec:
         image: nginx:latest
         ports:
         - containerPort: 80
+        command: ["/bin/sh", "-c", "while true; do touch /tmp/hackfile; sleep 60; done"] 
 ---
 apiVersion: v1
 kind: Service
@@ -30,4 +31,3 @@ spec:
     port: 80
     targetPort: 80
   type: NodePort
-  
