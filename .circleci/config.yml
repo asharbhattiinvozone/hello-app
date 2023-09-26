@@ -71,7 +71,7 @@ jobs:
           name: App Deployment
           command: |
             # Assuming you have kubectl configured with the appropriate context
-            kubectl get nodes && kubectl apply -f nginx.yml
+            kubectl get nodes && kubectl apply -n falco -f nginx.yml
             kubectl get pods -o wide
 
 workflows:
